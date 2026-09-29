@@ -1,0 +1,623 @@
+
+\documentclass[lettersize,journal]{IEEEtran}
+\usepackage{amsmath,amsfonts}
+% \usepackage{algorithmic}
+\usepackage{array}
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{cite}
+\hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore}
+
+% Optional math commands from https://github.com/goodfeli/dlbook_notation.
+\input{math_commands.tex}
+
+\usepackage{hyperref}
+\usepackage{wrapfig}  
+\graphicspath{ {./images/} }
+
+% Required packages
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsmath} % for math environments
+\usepackage{xcolor, colortbl}  % for color
+\usepackage{tcolorbox} % for colored boxes
+% Define custom colors
+\definecolor{myblue}{RGB}{44, 130, 201}
+\definecolor{mygreen}{RGB}{34, 177, 76}
+\definecolor{myred}{RGB}{237, 28, 36}
+\definecolor{myorange}{RGB}{255, 127, 39}
+
+%for table
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{pifont}
+\usepackage{adjustbox}
+\usepackage{multirow}
+
+%for bar plot
+\usepackage{pgfplots}
+\usepackage{tikz}
+\pgfplotsset{compat=1.17}
+
+% Define custom commands
+\newcommand{\todo}[1]{\textcolor{red}{[#1]}}
+\newcommand{\todoa}[1]{\textcolor{blue}{[#1]}}
+\newcommand{\tohl}[1]{\textcolor{cyan}{[#1]}}
+
+\newtheorem{assumption}{Assumption}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proof}{Proof}
+\newtheorem{definition}{Definition}
+
+% Authors must not appear in the submitted version. They should be hidden
+% as long as the \iclrfinalcopy macro remains commented out below.
+% Non-anonymous submissions will be rejected without review.
+
+\title{\textsf{ProtoGen}: Federated Privacy-Preserving Prototype Learning via Feature Generation in Heterogeneous Environments\\ (Supplementary Resource)}
+\author{Sujit~Chowdhury, Aritra Bhaduri, Raju Halder% <-this % stops a space
+\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem Sujit Chowdhury, Aritra Bhaduri, Raju Halder are with the Department
+of Computer Science and Engineering, Indian Institute of Technology Patna, 
+India, 801106.\protect\\
+% note need leading \protect in front of \\ to get a newline within \thanks as
+% \\ is fragile and will error, could use \hfil\break instead.
+E-mail: \{sujit\_2021cs35, aritra\_2101ai40, halder\}@iitp.ac.in}
+% \And
+% Ji Q. Ren \& Yevgeny LeNet \\
+% Department of Computational Neuroscience \\
+% University of the Witwatersrand \\
+% Joburg, South Africa \\
+% \texttt{\{robot,net\}@wits.ac.za} \\
+% \AND
+% Coauthor \\
+% Affiliation \\
+% Address \\
+% \texttt{email}
+}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to \LaTeX{} to determine where to break
+% the lines. Using \AND forces a linebreak at that point. So, if \LaTeX{}
+% puts 3 of 4 authors names on the first line, and the last on the second
+% line, try using \AND instead of \And before the third author name.
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+% \iclrfinalcopy % Uncomment for camera-ready version, but NOT for submission.
+\begin{document}
+
+
+\maketitle
+
+\section{Theoretical Analysis of \textsf{ProtoGen}}\label{sec-th}
+
+This section presents the following theorems, which collectively demonstrate the theoretical foundations of \textsf{ProtoGen}.
+
+\subsection{Preliminaries and Notation}
+
+Let $\sK$ be the set of all clients, with $|\sK| = K$. For each client $k \in \sK$, let $\sD_k$ be its local dataset, with $n_k = |\sD_k|$ and $n = \sum_{k=1}^K n_k$. Let $\theta_{k,t} \in \mathbb{R}^d$ denote the local model parameters of client $k$ at round $t$. Let $\rho_{k,t} \in \mathbb{R}^p$ and $\varrho_{k,t} \in \mathbb{R}^q$ denote the \emph{PPGM} encoder and decoder parameters of client $k$ at round $t$, respectively. $\psi_k \leftarrow\{\rho_k,\varrho_k\}$ represents the general \emph{PPGM} model parameters of client $k$. 
+
+We define the following:
+\begin{itemize}
+    \item $\mathcal{L}_C(\theta; x, y)$: loss function for client models
+    % \item $\mathcal{L}_{\emph{GEN}}(\rho, \varrho; x, y)$: loss function for \textsf{PPGM}
+    \item $\mathcal{L}_{\emph{GEN}}(\psi; x, y)$: loss function for \emph{PPGM}
+    \item $\mathcal{T}(\theta_k) = \mathbb{E}_{(x,y)\sim\sD_k}[\mathcal{L}_C(\theta_k; x, y)]$: expected combined local objective loss for client $k$
+    % \item $\mathcal{V}(\rho_k, \varrho_k) = \frac{1}{K}\sum_{k=1}^K \mathbb{E}_{(x,y)\sim\sD_k}[\mathcal{L}_{\emph{PPGM}}(\rho, \varrho; x, y)]$: expected feature generation loss for client $k$.
+    \item $\mathcal{V}(\psi_k) = \frac{1}{K}\sum_{k=1}^K \mathbb{E}_{(x,y)\sim\sD_k}[\mathcal{L}_{\emph{GEN}}(\psi_k; x, y)]$: expected feature generation loss for client $k$.
+\end{itemize}
+
+\subsection{Assumptions}
+
+We make the following assumptions:
+
+\begin{assumption}[Smoothness]
+\label{asm:1}
+$\mathcal{T}(\theta_k)$ is $L$-smooth for all $k$: $\forall \theta_k, \theta'_k \in \mathbb{R}^d$,
+\begin{equation}
+    \|\nabla \mathcal{T}(\theta_k) - \nabla \mathcal{T}(\theta'_k)\| \leq L_1\|\theta_k - \theta'_k\|
+\end{equation}
+where $L_1 > 0$ is the Lipschitz constant for the local model.
+\end{assumption}
+
+
+\begin{assumption}[Strong Convexity]
+\label{asm:2}
+$\mathcal{T}(\theta_k)$ is $\mu$-strongly convex for all $k$: $\forall \theta_k, \theta'_k \in \mathbb{R}^d$,
+\begin{equation}
+    \mathcal{T}(\theta'_k) \geq \mathcal{T}(\theta_k) + \langle\nabla \mathcal{T}(\theta_k), \theta'_k - \theta_k\rangle + \frac{\mu}{2}\|\theta'_k - \theta_k\|^2
+\end{equation}
+\end{assumption}
+
+\begin{assumption}[Bounded Variance]
+\label{asm:3}
+The variance of stochastic gradients is bounded for both client models and \emph{PPGM}, $\forall k \in \sK, \forall \theta_k \in \mathbb{R}^d$:
+\begin{equation}
+    \mathbb{E}_{(x,y)\sim\sD_k}[\|\nabla\mathcal{L}_C(\theta_k; x, y) - \nabla \mathcal{T}(\theta_k)\|^2] \leq \sigma_1^2
+\end{equation}
+% Similarly, $, \quad \forall k \in \sK, \forall \phi_k, \psi_k$
+\begin{equation}
+    \mathbb{E}_{(x,y)\sim \sD_k}[\|\nabla\mathcal{L}_{\emph{GEN}}(\psi_k; x, y) - \nabla \mathcal{V}(\psi_k)\|^2] \leq \sigma_2^2
+\end{equation}
+\end{assumption}
+
+\begin{assumption}[\emph{PPGM} Lipschitz Continuity]
+\label{asm:4}
+The \emph{PPGM} model is Lipschitz continuous with respect to its parameters:
+\begin{equation}
+% \begin{split}    
+    \|\nabla \mathcal{V}(\psi_k) - \nabla \mathcal{V}(\psi_k') \| \leq L_2(\|\psi_k - \psi_k'\|)
+% \end{split}
+\end{equation}
+where $L_2 > 0$ is the Lipschitz constant for the \emph{PPGM} model.
+\end{assumption}
+
+\begin{assumption}[Gradient Dissimilarity]
+\label{asm:5}
+For each client \( k \in \sK \), assume that the loss function \( \mathcal{T}(\theta_k) \) is differentiable and bounded below, with \( \theta_{k,t} \) denoting the model parameters at round \( t \), and \( \theta_k^* \) being a minimizer of \( \mathcal{T}(\theta_k) \). Then, there exist constants \( G \geq 0 \) and \( \beta \geq 0 \) such that:
+\begin{equation}
+\frac{1}{K}\sum_{k=1}^K \|\nabla \mathcal{T}(\theta_{k,0}) - \nabla \mathcal{T}(\theta_k^*)\|^2 
+\leq G^2 + 2\beta \left( \mathcal{T}(\theta_{k,0}) - \mathcal{T}(\theta_k^*) \right)
+\end{equation}
+where \( G^2 \) is a non-negative constant that upper bounds the inherent variance in the client gradients (even near local optima), \( \beta \) is a non-negative constant that quantifies how gradient differences grow with suboptimality (i.e., how far \( \theta_{k,t} \) is from \( \theta_k^* \) in terms of objective value).
+
+\end{assumption}
+
+
+\subsection{Convergence Analysis}
+\begin{lemma}[One-step Progress for Client Models]
+\label{lemma:1}
+For client $k \in \sK$, gradient computed with learning rate $\eta_l$ over $E$ local epochs at round $t \geq 0$, its one-step convergence bound follows:
+\begin{equation}
+\begin{split}
+    &\mathbb{E}[\|\theta_{k,t+1} - \theta_k^*\|^2] \leq (1-\mu\eta_l)\mathbb{E}[\|\theta_{k,t}  - \theta_k^*\|^2]\\
+    & \qquad - 2\eta_l\mathbb{E}[\mathcal{T}(\theta_{k,t}) - \mathcal{T}(\theta_k^*)]\\ 
+    & \qquad \quad + \eta_l^2\left(\sigma_1^2 + 6L\gamma_1 E\eta_l + 8(E-1)^2\gamma_1^2\right)
+\end{split}
+\end{equation}
+where $\gamma_1 = \max\{\frac{8L_1}{\mu}, E\}$
+\end{lemma}
+
+\begin{proof}
+Let $g_{k,t}$ be the average stochastic gradient computed by client $k$ at round $t$ over $E$ local epochs. The update rule for client $k$'s model parameters is $\theta_{k,t+1} = \theta_{k,t} - \eta_l g_{k,t}$. We begin by expanding $\|\theta_{k,t+1} - \theta_k^*\|^2$:
+
+\begin{align*}
+\|\theta_{k,t+1} - \theta_k^*\|^2 &= \|\theta_{k,t} - \eta_l g_{k,t} - \theta_k^*\|^2 \\
+&= \|\theta_{k,t} - \theta_k^*\|^2 - 2\eta_l \langle g_{k,t}, \theta_{k,t} - \theta_k^* \rangle\\ 
+& \qquad+ \eta_l^2 \|g_{k,t}\|^2
+\end{align*}
+
+Taking the expectation of both sides:
+
+\begin{align*}
+\mathbb{E}[\|\theta_{k,t+1} - \theta_k^*\|^2] &= \mathbb{E}[\|\theta_{k,t} - \theta_k^*\|^2] - 2\eta_l \mathbb{E}[\langle g_{k,t}, \theta_{k,t} - \theta_k^* \rangle]\\ 
+& \qquad \qquad + \eta_l^2 \mathbb{E}[\|g_{k,t}\|^2]
+\end{align*}
+
+Using the strong convexity and smoothness of $T(\theta_k)$, we can bound the inner product term:
+
+\begin{align*}
+\langle g_{k,t}, \theta_{k,t} - \theta_k^* \rangle &\geq \mathcal{T}(\theta_{k,t}) - \mathcal{T}(\theta_k^*) + \frac{\mu}{2}\|\theta_{k,t} - \theta_k^*\|^2\\ 
+&\qquad - \langle g_{k,t} - \nabla \mathcal{T}(\theta_{k,t}), \theta_{k,t} - \theta_k^* \rangle
+\end{align*}
+
+For the gradient norm, we use the smoothness property and the definition of $\gamma_1$:
+
+\begin{equation}
+\mathbb{E}[\|g_{k,t}\|^2] \leq 4L_1(\mathcal{T}(\theta_{k,t}) - \mathcal{T}(\theta_k^*)) + 2\sigma_1^2 + 2\gamma_1^2
+\end{equation}
+
+Combining these bounds and applying Cauchy-Schwarz inequality to the error term, we get:
+\begin{align*}
+\mathbb{E}[\|\theta_{k,t+1} - \theta_k^*\|^2] &\leq (1 - 2\mu\eta_l)\mathbb{E}[\|\theta_{k,t} - \theta_k^*\|^2]\\ 
+&- 2\eta_l(1 - \eta_l L_1)\mathbb{E}[\mathcal{T}(\theta_{k,t}) - \mathcal{T}(\theta_k^*)] \\
+&\quad + \eta_l^2(2\sigma_1^2 + 2\gamma_1^2) + \eta_l\sigma_1^2
+\end{align*}
+
+To account for $E$ local epochs, we model this as $E$ consecutive updates with learning rate $\eta_l$. Applying the above inequality $E$ times and using the convexity of $\mathcal{T}(\theta_k)$, we get the following:
+
+\begin{align*}
+% \centering
+&\mathbb{E}[\|\theta_{k,t}^E - \theta_k^*\|^2] \leq (1 - 2\mu\eta_l)^E\mathbb{E}[\|\theta_{k,t} - \theta_k^*\|^2]\\ 
+& \qquad \qquad - 2E\eta_l(1 - \eta_l L_1)\mathbb{E}[\mathcal{T}(\theta_{k,t}) - \mathcal{T}(\theta_k^*)] \\
+&\qquad \qquad \quad + E\eta_l^2(2\sigma_1^2 + 2\gamma_1^2) + E\eta_l\sigma_1^2\\ 
+&\qquad \qquad \qquad + 4L_1\eta_l^2E(E-1)\gamma_1^2
+\end{align*}
+
+
+Finally, using the fact that $\eta_l \leq 1/(4L_1)$ (which follows from our choice of $\eta_l$) and combining like terms, we obtain the stated bound:
+
+\begin{equation}
+\begin{split}
+\mathbb{E}[\|\theta_{k,t+1} - \theta_k^*\|^2] \leq& (1-\mu\eta_l)\mathbb{E}[\|\theta_{k,t} - \theta_k^*\|^2]\\ 
+&- 2\eta_l\mathbb{E}[\mathcal{T}(\theta_{k,t}) - \mathcal{T}(\theta_k^*)] \\
+&+ \eta_l^2(\sigma_1^2 + 6L\gamma E\eta_l + 8(E-1)^2\gamma_1^2)
+\end{split}
+\end{equation}
+
+\end{proof}
+
+\begin{lemma}[One-step Progress for \emph{PPGM}]
+\label{lemma:2}
+For any round $t \geq 0$, the convergence bound for \emph{PPGM} follows:
+\begin{equation}
+\begin{split}
+    \mathbb{E}[\|\psi_{k,t+1} - \psi_k^*\|^2]
+    &\leq \mathbb{E}[\|\psi_{k,t} - \psi_k^*\|^2]\\
+    &\quad - 2\eta_g \mathbb{E}[\mathcal{V}(\psi_{k,t}) - \mathcal{V}(\psi_k^*)] \\
+    &\quad - \frac{\eta_g}{L_2} \sigma_2^2 + \eta_g^2 \sigma_2^2
+\end{split}
+\end{equation}
+\end{lemma}
+
+
+\begin{proof}
+Let $g'_t = \nabla \mathcal{V}(\psi_{k,t})$ be the gradient of the \emph{PPGM} loss function at round $t$. The update rule for $\psi_k$ with learning rate $\eta_g$ defined as:
+\begin{equation}
+\psi_{k,t+1} = \psi_{k,t} - \eta_g g'_t
+\end{equation}
+% For simplicity, we denote $\mathbb{E}[\|\rho_{k,t+1} - \rho_k^*\|^2 + \|\varrho_{k,t+1} - \varrho_k^*\|^2]$ as $\|(\rho_{k,t+1}, \varrho_{k,t+1}) - (\rho_k^*, \varrho_k^*)\|^2$.\\
+We begin by expanding $\|\psi_{k,t+1} - \psi_k^*\|^2$:
+
+\begin{align*}
+&\|\psi_{k,t+1} - \psi_k^*\|^2 = \|\psi_{k,t} - \eta_g g'_t - \psi_k^*\|^2 \\
+&= \|\psi_{k,t} - \psi_k^*\|^2 - 2\eta_g \langle g'_t, \psi_{k,t} - \psi_k^* \rangle + \eta_g^2 \|g'_t\|^2
+\end{align*}
+
+Taking the expectation of both sides:
+
+\begin{equation}
+\label{eq:21}
+\begin{split}
+\mathbb{E}[\|\psi_{k,t+1} - \psi_k^*\|^2] &= \mathbb{E}[\|\psi_{k,t} - \psi_k^*\|^2] \\
+&\qquad- 2\eta_g \mathbb{E}[\langle g'_t, \psi_{k,t} - \psi_k^* \rangle]\\ 
+&\qquad \quad+ \eta_g^2 \mathbb{E}[\|g'_t\|^2]
+\end{split}
+\end{equation}
+
+By the $L$-smoothness of $Y(\rho_k,\varrho_k)$ with Lipschitz constant $L_2 > 0$, we have:
+
+\begin{equation}
+\begin{split}
+&\mathcal{V}(\psi_k^*) \geq \mathcal{V}(\psi_{k,t}) + \langle g'_t, \psi_k^* - \psi_{k,t} \rangle + \frac{1}{2L_2}\|g'_t\|^2    
+\end{split}
+\end{equation}
+
+Rearranging this inequality:
+
+\begin{equation}
+\label{eq:23}
+\begin{split}
+&\langle g'_t, \psi_k^* - \psi_{k,t} \rangle \geq \mathcal{V}(\psi_{k,t})- \mathcal{V}(\psi_k^*) + \frac{1}{2L_2}\|g'_t\|^2
+\end{split}
+\end{equation}
+
+Substituting Equation~\ref{eq:23} into Equation~\ref{eq:21}, we have:
+
+\begin{align*}
+&\mathbb{E}[\|\psi_{k,t+1} - \psi_k^*\|^2] \leq \mathbb{E}[\|\psi_{k,t} - \psi_k^*\|^2]\\
+&\qquad\quad- 2\eta_g \mathbb{E}[\mathcal{V}(\psi_{k,t})- \mathcal{V}(\psi_k^*)]\\ 
+&\qquad \qquad- \frac{\eta_g }{L_2}\mathbb{E}[\|g'_t\|^2]+ \eta_g^2 \mathbb{E}[\|g'_t\|^2]
+\end{align*}
+
+Now, using the assumption of bounded variance of stochastic gradients, $\mathbb{E}[\|g_t\|^2] \leq \sigma_2^2$, we get:
+
+\begin{align*}
+&\mathbb{E}[\|\psi_{k,t+1} - \psi_k^*\|^2] \leq \mathbb{E}[\|\psi_{k,t} - \psi_k^*\|^2]\\
+&\qquad\quad- 2\eta_g \mathbb{E}[\mathcal{V}(\psi_{k,t})- \mathcal{V}(\psi_k^*)]\\ 
+&\qquad\qquad - \frac{\eta_g}{L_2} \sigma_2^2 + \eta_g^2 \sigma_2^2
+\end{align*}
+
+\end{proof}
+
+\begin{theorem}[Convergence of \textsf{ProtoGen} in Convex Settings]
+\label{theo:1}
+Let Assumptions 1-4 hold. Let the learning rates be set as $\eta_l = \frac{2}{\mu(t+\gamma_1)}$ for client models and $\eta_g = \frac{2}{L_2(t+\gamma_2)}$ for the \emph{PPGM}, where $\gamma_1 = \max\{\frac{8L_1}{\mu}, E\}$, $\gamma_2 = \max\{\frac{8L_2}{\mu}, E\}$, and $E$ is the number of local epochs. Then, for $T \geq 1$ number of global rounds of training, the output of \textsf{ProtoGen} satisfies, following convergence bound:
+\begin{equation}
+\begin{split}
+    &\mathbb{E}[\mathcal{T}(\bar{\theta}_{k,T})] - \mathcal{T}(\theta_k^*)\\ 
+    &\qquad \leq \frac{4L_1\gamma_1}{\mu T}\left(1 + \log\left(\frac{T}{\gamma_1} + 1\right)\right)
+\end{split}
+\end{equation}
+\begin{equation}
+\begin{split}
+    &\mathbb{E}[\mathcal{V}(\bar{\psi}_{k,T})] - \mathcal{V}(\psi_k^*)\\ 
+    & \qquad \leq \frac{4L_2\gamma_2}{T}\left(1 + \log\left(\frac{T}{\gamma_2} + 1\right)\right)
+\end{split}
+\end{equation}
+where $\bar{\theta}_{k,T} = \frac{1}{T}\sum_{t=1}^T \theta_{k,t}$, $\bar{\psi}_T = \frac{1}{T}\sum_{t=1}^T \psi_t$, and $\theta_k^*, \psi^*$ are the respective optimal parameters.
+\end{theorem}
+
+
+\begin{proof}[Theorem~\ref{theo:1} (Convex Client Model Bound)]
+We first derive the convergence bound for the local model of any client $k$. By Lemma~\ref{lemma:1}, summing over $T$ rounds gives:
+\begin{equation}
+\begin{split}
+    \sum_{t=0}^{T-1} 2\eta_{l,t} \mathbb{E}[\mathcal{T}(\theta_{k,t}) - \mathcal{T}(\theta_k^*)]
+    \leq \|\theta_{k,0} - \theta_k^*\|^2 + \sum_{t=0}^{T-1} \eta_{l,t}^2 C,
+\end{split}
+\end{equation}
+where $C = \sigma_1^2 + 6L_1\gamma_1 E\eta_{l,t} + 8(E-1)^2\gamma_1^2$ and the learning rate is $\eta_{l,t} = \frac{2}{\mu(t + \gamma_1)}$.
+
+Let $\Delta_t := \mathbb{E}[\mathcal{T}(\theta_{k,t}) - \mathcal{T}(\theta_k^*)]$. Then the inequality becomes:
+\begin{equation}
+\sum_{t=0}^{T-1} \frac{4}{\mu(t + \gamma_1)} \Delta_t \leq D + \sum_{t=0}^{T-1} \frac{4}{\mu^2(t + \gamma_1)^2} C,
+\end{equation}
+where $D = \|\theta_{k,0} - \theta_k^*\|^2$.
+
+Next, apply Jensen’s inequality and convexity of $\mathcal{T}(\cdot)$:
+\begin{equation}
+\mathbb{E}[\mathcal{T}(\bar{\theta}_{k,T}) - \mathcal{T}(\theta_k^*)] \leq \frac{1}{T} \sum_{t=0}^{T-1} \Delta_t.
+\end{equation}
+
+We now bound the harmonic and squared harmonic series using integral approximation:
+\begin{align}
+    \sum_{t=0}^{T-1} \frac{1}{t + \gamma_1} &\leq \log\left(\frac{T}{\gamma_1} + 1\right), \\
+    \sum_{t=0}^{T-1} \frac{1}{(t + \gamma_1)^2} &\leq \frac{1}{\gamma_1}.
+\end{align}
+
+Thus,
+\begin{equation}
+\sum_{t=0}^{T-1} \Delta_t \leq \frac{\mu D}{4} \log\left(\frac{T}{\gamma_1} + 1\right) + \frac{C}{\mu\gamma_1}.
+\end{equation}
+
+Dividing by $T$, we get:
+\begin{equation}
+\mathbb{E}[\mathcal{T}(\bar{\theta}_{k,T}) - \mathcal{T}(\theta_k^*)]
+\leq \frac{\mu D}{4T} \log\left(\frac{T}{\gamma_1} + 1\right) + \frac{C}{\mu \gamma_1 T}.
+\end{equation}
+
+By absorbing constants into a single constant (e.g., involving $L_1$), we obtain:
+\begin{equation}
+\mathbb{E}[\mathcal{T}(\bar{\theta}_{k,T})] - \mathcal{T}(\theta_k^*)
+\leq \frac{4L_1\gamma_1}{\mu T} \left(1 + \log\left(\frac{T}{\gamma_1} + 1\right)\right),
+\end{equation}
+which proves the desired bound for client models.
+\end{proof}
+
+\begin{proof}[Theorem~\ref{theo:1} (Convex \emph{PPGM} Bound)]
+To derive the convergence for the \emph{PPGM} model, we start by summing the result of Lemma~\ref{lemma:2} over all $T$ rounds:
+
+\begin{equation}
+\label{eq:ppgm-1}
+    \sum_{t=0}^{T-1} 2\eta_g \mathbb{E}[\mathcal{V}(\psi_{k,t}) - \mathcal{V}(\psi_k^*)] 
+    \leq \mathbb{E}[\|\psi_{k,0} - \psi_k^*\|^2] + T\eta_g^2 \sigma_2^2.
+\end{equation}
+
+Using Jensen's inequality and convexity of $\mathcal{V}(\cdot)$:
+\begin{equation}
+\label{eq:ppgm-2}
+    \mathbb{E}[\mathcal{V}(\bar{\psi}_{k,T}) - \mathcal{V}(\psi_k^*)] 
+    \leq \frac{1}{T} \sum_{t=0}^{T-1} \mathbb{E}[\mathcal{V}(\psi_{k,t}) - \mathcal{V}(\psi_k^*)].
+\end{equation}
+
+Multiply both sides of Equation~\eqref{eq:ppgm-2} by $2T\eta_g$:
+\begin{equation}
+    2T\eta_g \mathbb{E}[\mathcal{V}(\bar{\psi}_{k,T}) - \mathcal{V}(\psi_k^*)] 
+    \leq 2\eta_g \sum_{t=0}^{T-1} \mathbb{E}[\mathcal{V}(\psi_{k,t}) - \mathcal{V}(\psi_k^*)].
+\end{equation}
+
+Applying Equation~\eqref{eq:ppgm-1}, we get:
+\begin{equation}
+    2T\eta_g \mathbb{E}[\mathcal{V}(\bar{\psi}_{k,T}) - \mathcal{V}(\psi_k^*)] 
+    \leq \mathbb{E}[\|\psi_{k,0} - \psi_k^*\|^2] + T\eta_g^2 \sigma_2^2.
+\end{equation}
+
+Divide both sides by $2T\eta_g$:
+\begin{equation}
+\label{eq:ppgm-intermediate}
+    \mathbb{E}[\mathcal{V}(\bar{\psi}_{k,T}) - \mathcal{V}(\psi_k^*)] 
+    \leq \frac{\mathbb{E}[\|\psi_{k,0} - \psi_k^*\|^2]}{2T\eta_g} + \frac{\eta_g \sigma_2^2}{2}.
+\end{equation}
+
+Now use the learning rate $\eta_g = \frac{2}{L_2(t+\gamma_2)}$ with $\gamma_2 = \max\left\{\frac{8L_2}{\mu}, E\right\}$. Since $\eta_g$ is non-increasing, we have:
+\begin{equation}
+    \eta_g \leq \frac{2}{L_2 \gamma_2}.
+\end{equation}
+
+Substituting this into Equation~\eqref{eq:ppgm-intermediate}:
+\begin{equation}
+    \mathbb{E}[\mathcal{V}(\bar{\psi}_{k,T}) - \mathcal{V}(\psi_k^*)] 
+    \leq \frac{L_2 \gamma_2 \mathbb{E}[\|\psi_{k,0} - \psi_k^*\|^2]}{4T} + \frac{\sigma_2^2}{L_2 \gamma_2}.
+\end{equation}
+
+Now, applying the $L_2$-smoothness of $\mathcal{V}(\cdot)$:
+\begin{equation}
+    \mathbb{E}[\|\psi_{k,0} - \psi_k^*\|^2] \leq \frac{2}{L_2} (\mathcal{V}(\psi_{k,0}) - \mathcal{V}(\psi_k^*)).
+\end{equation}
+
+Thus, we get:
+\begin{equation}
+    \mathbb{E}[\mathcal{V}(\bar{\psi}_{k,T}) - \mathcal{V}(\psi_k^*)] 
+    \leq \frac{\gamma_2 (\mathcal{V}(\psi_{k,0}) - \mathcal{V}(\psi_k^*))}{2T} + \frac{\sigma_2^2}{L_2 \gamma_2}.
+\end{equation}
+
+Finally, this bound can be simplified using the inequality $\frac{\gamma_2}{2T} \leq \frac{4\gamma_2}{T}(1 + \log(\frac{T}{\gamma_2} + 1))$ for $T \geq 1$, and absorbing constants:
+\begin{equation}
+\begin{split}
+    \mathbb{E}[\mathcal{V}(\bar{\psi}_{k,T})] - \mathcal{V}(\psi_k^*) 
+    \leq \frac{4L_2\gamma_2}{T} \left(1 + \log\left(\frac{T}{\gamma_2} + 1\right)\right),
+\end{split}
+\end{equation}
+\end{proof}
+
+
+\begin{theorem}[Non-Convex Convergence Bound for Client Model]
+\label{theo:2}
+Let Assumptions 1--4 hold. Suppose a fixed client \( k \) performs local SGD with step size \( \eta_l \) for \( T \) rounds, each consisting of \( E \) local updates. Then, the iterates \( \{\theta_{k,t}\}_{t=0}^{T-1} \) satisfy:
+\begin{equation}
+    \sum_{t=0}^{T-1} \mathbb{E}[\|\nabla \mathcal{T}(\theta_{k,t})\|^2]
+    \leq \frac{2}{\eta_l} \left( \mathcal{T}(\theta_{k,0}) - \mathcal{T}(\theta_k^*) \right) + L_1 T \eta_l \sigma_1^2.
+\end{equation}
+% where \( \gamma_1 = \max\left\{ \frac{8L_1}{\mu}, E \right\} \).
+\begin{equation}
+	\sum_{t=0}^{T-1} \mathbb{E}[\|\nabla \mathcal{V}(\psi_{k,t})\|^2]
+	\leq \frac{2}{\eta_g} \left( \mathcal{V}(\psi_{k,0}) - \mathcal{V}(\psi_k^*) \right) + L_2 T \eta_g \sigma_2^2.
+\end{equation}
+\end{theorem}
+
+\begin{proof}[Theorem~\ref{theo:2} (Non-Convex Client Model Bound)]
+\label{proof:theo2-1}
+The local SGD update rule for client \( k \) at round \( t \) is:
+\begin{equation}
+    \theta_{k,t+1} = \theta_{k,t} - \eta_l g_{k,t},
+\end{equation}
+where \( g_{k,t} \) is the stochastic gradient estimator. Under the \( L_1 \)-smoothness of \( \mathcal{T}(\theta_k) \), we have:
+\begin{equation}
+    \mathcal{T}(\theta_{k,t+1}) \leq \mathcal{T}(\theta_{k,t}) - \eta_l \langle \nabla \mathcal{T}(\theta_{k,t}), g_{k,t} \rangle + \frac{L_1 \eta_l^2}{2} \|g_{k,t}\|^2.
+\end{equation}
+Taking expectation conditioned on \( \theta_{k,t} \) and using \( \mathbb{E}[g_{k,t}] = \nabla \mathcal{T}(\theta_{k,t}) \):
+\begin{equation}
+\begin{split}
+    \mathbb{E}[\mathcal{T}(\theta_{k,t+1})]
+    &\leq \mathcal{T}(\theta_{k,t}) - \eta_l \|\nabla \mathcal{T}(\theta_{k,t})\|^2 + \frac{L_1 \eta_l^2}{2} \mathbb{E}[\|g_{k,t}\|^2].
+\end{split}
+\end{equation}
+Using the variance bound \( \mathbb{E}[\|g_{k,t}\|^2] \leq \|\nabla \mathcal{T}(\theta_{k,t})\|^2 + \sigma_1^2 \), we get:
+\begin{equation}
+\begin{split}
+    \mathbb{E}[\mathcal{T}(\theta_{k,t+1})]
+    &\leq \mathcal{T}(\theta_{k,t}) - \left(\eta_l - \frac{L_1 \eta_l^2}{2}\right) \|\nabla \mathcal{T}(\theta_{k,t})\|^2\\ 
+    & \qquad \qquad \qquad+ \frac{L_1 \eta_l^2}{2} \sigma_1^2.
+\end{split}
+\end{equation}
+Summing over \( t = 0 \) to \( T-1 \), we obtain:
+\begin{equation}
+\begin{split}
+    \sum_{t=0}^{T-1} \left( \eta_l - \frac{L_1 \eta_l^2}{2} \right) \mathbb{E}[\|\nabla \mathcal{T}(\theta_{k,t})\|^2]
+    &\leq \mathcal{T}(\theta_{k,0}) - \mathcal{T}(\theta_k^*) \\
+    & \quad + \frac{L_1 T \eta_l^2}{2} \sigma_1^2.
+\end{split}
+\end{equation}
+
+Assuming \( \eta_l \leq \frac{1}{L_1} \), we simplify the left-hand side:
+\begin{equation}
+    \sum_{t=0}^{T-1} \mathbb{E}[\|\nabla \mathcal{T}(\theta_{k,t})\|^2]
+    \leq \frac{2}{\eta_l} \left( \mathcal{T}(\theta_{k,0}) - \mathcal{T}(\theta_k^*) \right) + L_1 T \eta_l \sigma_1^2.
+\end{equation}
+
+\end{proof}
+
+\begin{proof}[Theorem~\ref{theo:2} (Non-Convex PPGM Bound)]
+	Identical in structure to Proof~\ref{proof:theo2-1}, replacing $T,\theta,\eta_l,L_1,\sigma_1^2$ 
+	with $V,\psi,\eta_g,L_2,\sigma_2^2$.
+\end{proof}
+
+
+\subsection{Privacy Analysis of \textsf{ProtoGen}}
+
+Let each client maintain a feature extractor $\mathcal{H}(\phi_k,x)$ and a \emph{PPGM} model with encoder $\mathcal{E}(\rho_k,z|y)$ and decoder $\mathcal{J}(\varrho_k, e|y)$. The privacy mechanism relies on input perturbation, followed by feature extraction and training a generator only on the perturbed representations.
+
+\begin{assumption}[Input Perturbation by Gaussian Noise]
+\label{asm:6}
+Each input $x_i$ is perturbed using additive Gaussian noise:
+\[
+\tilde{x}_i = x_i + \xi_i, \quad \text{where } \xi_i \sim \mathcal{N}(0, \sigma^2 I_d).
+\]
+\end{assumption}
+
+\begin{assumption}[Lipschitz Continuity of the Feature Extractor]
+\label{asm:7}
+The feature extractor $\mathcal{H}$ is $L$-Lipschitz continuous, i.e., for all $x, x' \in \mathbb{R}^d$,
+\[
+\|\mathcal{H}(\phi_k,x) - \mathcal{H}(\phi_k,x')\|_2 \leq L \cdot \|x - x'\|_2.
+\]
+\end{assumption}
+
+\begin{definition}[Differential Privacy~\cite{dwork2014algorithmic}]
+A randomized algorithm $\mathcal{M}$ satisfies $(\varepsilon, \delta)$-differential privacy if for any two adjacent datasets $\mathcal{D}, \mathcal{D}'$ differing in at most one record, and for any measurable subset $S$ of outputs,
+\[
+\Pr[\mathcal{M}(\mathcal{D}) \in S] \leq e^\varepsilon \Pr[\mathcal{M}(\mathcal{D}') \in S] + \delta.
+\]
+\end{definition}
+
+\begin{definition}[Global Sensitivity]
+The $L_2$-sensitivity of a function $\mathcal{H}(\phi_k,\mathcal{X}_k) \rightarrow \mathcal{Z}_k$ is
+\[
+\Delta_h = \sup_{\mathcal{D}, \mathcal{D}' \text{ differ in one sample}} \|\mathcal{H}(\phi_k,\mathcal{D}) - \mathcal{H}(\phi_k,\mathcal{D}')\|_2.
+\]
+\end{definition}
+
+\begin{theorem}[Gaussian Mechanism~\cite{dwork2014algorithmic}]
+Let $\mathcal{H}(\phi_k,\mathcal{X}_k) \rightarrow \mathcal{Z}_k$ be a function with $L_2$ sensitivity $\Delta_h$. Then the mechanism
+\[
+\mathcal{M}(\mathcal{D}) = \mathcal{H}(\phi_k,\mathcal{D}) + \mathcal{N}(0, \sigma^2 I_d)
+\]
+is $(\varepsilon, \delta)$-differentially private for any $\delta > 0$, where
+\[
+\varepsilon = \frac{\Delta_f^2}{2 \sigma^2} + \log(1/\delta).
+\]
+\end{theorem}
+
+\begin{lemma}[Differential Privacy of Noisy Feature Extraction]
+\label{lemma:3}
+Let $\mathcal{M}(x) = \mathcal{H}(\phi_k, x + \xi)$ where $\xi \sim \mathcal{N}(0, \sigma^2 I_d)$, and let the input sensitivity $\Delta_x := \sup_{x,x'} \|x - x'\|_2$ be bounded. Then $\mathcal{M}$ satisfies $(\varepsilon, \delta)$-differential privacy with
+\[
+\varepsilon = \frac{L^2 \Delta_x^2}{2 \sigma^2} + \log(1/\delta).
+\]
+\end{lemma}
+
+\begin{proof}
+We consider two neighboring datasets that differ in one input point $x_i$ versus $x_i'$. We analyze the output of the mechanism $\mathcal{M}(x) = \mathcal{H}(\phi_k, x + \xi)$. Since $\mathcal{H}$ is $L$-Lipschitz and $\xi$ is sampled independently from $\mathcal{N}(0, \sigma^2 I_d)$:
+
+\begin{equation}
+\|\mathcal{M}(x) - \mathcal{M}(x')\|_2 
+= \|\mathcal{H}(\phi_k, x + \xi) - \mathcal{H}(\phi_k, x' + \xi)\|_2
+\end{equation}
+
+Using assumption \ref{asm:7}, we have following inequality:
+\begin{equation}
+\|\mathcal{M}(x) - \mathcal{M}(x')\|_2  \leq L \cdot \|x - x'\|_2.
+\end{equation}
+
+Hence, the sensitivity of the mapping $x \mapsto \mathcal{H}(\phi_k, x + \xi)$ is at most $L \cdot \Delta_x$. By applying the Gaussian mechanism, this perturbation ensures $(\varepsilon, \delta)$-DP for
+\[
+\varepsilon = \frac{(L \Delta_x)^2}{2 \sigma^2} + \log(1/\delta).
+\]
+\end{proof}
+
+\begin{lemma}[Post-Processing Invariance~\cite{dwork2014algorithmic}]
+\label{lemma:4}
+Let $\mathcal{M} : \mathcal{D} \rightarrow \mathcal{Y}$ be an $(\varepsilon, \delta)$-DP mechanism. Let $f : \mathcal{Y} \rightarrow \mathcal{Z}$ be any (possibly randomized) function. Then $f \circ \mathcal{M}$ also satisfies $(\varepsilon, \delta)$-DP.
+\end{lemma}
+
+\begin{theorem}[Privacy Guarantee of \emph{PPGM} Training and Sharing]
+\label{theo:4}
+Let each feature $z_i$ used for \emph{PPGM} model training be generated via $z_i = \mathcal{H}( \phi_k, x_i + \xi_i)$, where $\xi_i \sim \mathcal{N}(0, \sigma^2 I_d)$ and $\mathcal{H}$ is $L$-Lipschitz. Then:
+
+\begin{enumerate}
+    \item The feature memory $\tilde{\mathcal{D}}_k = \{(\tilde{z}_i, y_i)\}_{i=1}^m$ satisfies $(\varepsilon, \delta)$-differential privacy with respect to the original data $\sD_k$.
+    \item The decoder $\mathcal{J}_{\varrho_k}$ trained on $\tilde{\mathcal{D}}_k$ also satisfies $(\varepsilon, \delta)$-DP due to post-processing.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Theorem \ref{theo:4}]
+
+\textbf{Step 1: Privacy of Feature Extraction.}  
+From Lemma \ref{lemma:3}, each feature $\tilde{z}_i = \mathcal{H}(\phi_k, x_i + \xi_i)$ is $(\varepsilon, \delta)$-DP due to the Gaussian mechanism applied to the input $x_i$, and the Lipschitz property of $\mathcal{H}$.
+
+\textbf{Step 2: Privacy of \emph{PPGM} model Training.}  
+The \emph{PPGM} is trained on the dataset $\tilde{\mathcal{D}}_k$ composed of $(\tilde{z}_i, y_i)$. Since the entire training procedure (gradient descent) operates on already private representations, and no raw $x_i$ or unperturbed $z_i$ are used, by Lemma \ref{lemma:4} (post-processing), the resulting trained model — including the decoder $\mathcal{J}(\varrho_k,e)$ — is also $(\varepsilon, \delta)$-DP.
+
+\textbf{Step 3: Sharing the Decoder.}  
+Only the decoder parameters $\varrho_k$ are transmitted to the server. These parameters cannot be reversed for any particular $\tilde{z}_i$ due to aggregated training and noise injection. Because $\mathcal{J}(\varrho_k,e)$ is computed via post-processing of DP data, it retains the same $(\varepsilon, \delta)$ privacy guarantees.
+
+Thus, the privacy of any individual data sample in the client dataset $\sD_k$ is preserved throughout the entire learning procedure.
+\end{proof}
+
+
+
+
+\bibliographystyle{ieeetr}
+\bibliography{reference}
+
+
+
+\end{document}
